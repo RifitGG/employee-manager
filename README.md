@@ -1,1 +1,2 @@
-# employee-manager
+# Учёт сотрудников
+![Интерфейс ПО](https://iimg.su/i/R0tM4L "Интерфейс ПО")
