@@ -2,7 +2,7 @@
 ![img](https://github.com/RifitGG/employee-manager/blob/main/md%20files/interface.png)
 
 
->[!TIP]
+>[!Ссылки для работы с документацией]
 +
 > [!ВАЖНО]
 > ## Для запуска данного приложения требуется установка зависимостей pip install PyQt5 reportlab sqlite3
@@ -33,4 +33,25 @@ class DatabaseManager:
         self.connection.execute(query)
         self.connection.commit()
 ```
-### В самой БД реализованн базовый функционал добавления, удаления, обновления и изъятие из базы данных сотрудников для изъятия из бд для дальнейших отчетов 
+### В самой БД реализован базовый функционал добавления, удаления, обновления и изъятие из базы данных сотрудников для изъятия из бд для дальнейших отчетов 
+## Функция добавления:
+реализованна простым методом внесения информации INSERT INTO и последующим комитом в БД
+```python
+    def add_employee(self, data):
+        query = """
+            INSERT INTO employees
+            (first_name, last_name, date_of_birth, position, phone, email, start_date)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """
+        self.connection.execute(query, (
+            data['first_name'],
+            data['last_name'],
+            data['date_of_birth'],
+            data['position'],
+            data['phone'],
+            data['email'],
+            data['start_date']
+        ))
+        self.connection.commit()
+```
+
