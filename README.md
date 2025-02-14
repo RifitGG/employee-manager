@@ -5,3 +5,4 @@
 >[!TIP]
 > [!IMPORTANT]
 > ## Для запуска данного приложения требуется установка зависимостей pip install PyQt5 reportlab sqlite3
+pip install PyQt5 reportlab sqlite3
