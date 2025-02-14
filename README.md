@@ -1,7 +1,7 @@
 # Учёт сотрудников
 ![img](https://github.com/RifitGG/employee-manager/blob/main/md%20files/interface.png)
 
-> [!IMPORTANT]
+> ⚠ **Important**
 
 [Основной синтаксис БД](#Основной-синтаксис-БД)
 
@@ -11,7 +11,7 @@ pip install PyQt5 reportlab sqlite3
 
 
 >Приложение основанно на работе с БД SQLite3, которое можно заменить на более сложную базу данных.
-> [!ВАЖНО]
+> ⚠ **Important**
 ## Основной синтаксис БД
 ```python
 class DatabaseManager:
