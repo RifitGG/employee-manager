@@ -1,5 +1,8 @@
 # Учёт сотрудников
 ![img](https://github.com/RifitGG/employee-manager/blob/main/md%20files/interface.png)
+> [!Быстрое перемещение]
++ [Основнйо синтаксис БД](#https://github.com/RifitGG/employee-manager#основной-синтаксис-бд)
+
 
 > [!ВАЖНО]
 > ## Для запуска данного приложения требуется установка зависимостей pip install PyQt5 reportlab sqlite3
