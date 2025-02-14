@@ -1,7 +1,10 @@
 # Учёт сотрудников
 ![img](https://github.com/RifitGG/employee-manager/blob/main/md%20files/interface.png)
 > [!Быстрое перемещение]
+[Основной синтаксис БД](#Основной-синтаксис-БД)
 
+## Some Title 1
+Some content
 
 
 > [!ВАЖНО]
