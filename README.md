@@ -8,7 +8,6 @@
 >> - [Функция изъятия ](#Функция-изъятия)
  ## ⚠ **ВАЖНО**
  ### Для запуска данного приложения требуется установка зависимостей:
-pip install PyQt5 reportlab sqlite3
 ```console
 pip install PyQt5 reportlab sqlite3
 ```
