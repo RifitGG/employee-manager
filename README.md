@@ -9,9 +9,9 @@
 pip install PyQt5 reportlab sqlite3
 
 
->Приложение основанно на работе с БД SQLite3, которое можно заменить на более сложную базу данных.
 
 ## Основной синтаксис БД
+>Приложение основанно на работе с БД SQLite3, которое можно заменить на более сложную базу данных.
 ```python
 class DatabaseManager:
     def __init__(self, db_filename="employees.db"):
