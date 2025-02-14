@@ -97,4 +97,15 @@ Where id=? гарантирует удаления только определё
 Курсор используется для выполнения SQL-запросов и получения результатов.
 Цикл if else - проверка наличия фильтра Если передан аргумент filter_by_position (то есть не равен None или пустому значению), формируется SQL-запрос с условием WHERE position=?. Здесь знак вопроса является плейсхолдером для значения фильтра. Если фильтр не задан, выбираются все записи из таблицы employees.
 Метод fetchall() возвращает все строки, полученные в результате выполнения запроса, в виде списка кортежей.
+```pyton
+    def fetch_employees(self, filter_by_position=None):
+        cursor = self.connection.cursor()
+        if filter_by_position:
+            query = "SELECT * FROM employees WHERE position=?"
+            cursor.execute(query, (filter_by_position,))
+        else:
+            query = "SELECT * FROM employees"
+            cursor.execute(query)
+        return cursor.fetchall()
+```
 
