@@ -2,8 +2,8 @@
 ![img](https://github.com/RifitGG/employee-manager/blob/main/md%20files/interface.png)
 
 
-[Основной синтаксис БД](#Основной-синтаксис-БД)
-
+-[Основной синтаксис БД](#Основной-синтаксис-БД)
+      
  ## ⚠ **ВАЖНО**
  ### Для запуска данного приложения требуется установка зависимостей:
 pip install PyQt5 reportlab sqlite3
