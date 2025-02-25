@@ -115,12 +115,12 @@ class DatabaseManager:
         return cursor.fetchall()
 ```
 ## Синтаксис Main_Window:
-> В данном фрагменте кода создаётся главное окно и основной функционал
-> Этот класс наследуется от QMainWindow и отвечает за основное окно программы. При инициализации:
-> 1. Устанавливается заголовок и размер окна.
-> 2. Создается объект DatabaseManager для работы с базой данных.
-> 3. Вызывается метод init_ui() для настройки интерфейса.
-> 4. Загружаются данные сотрудников в таблицу через load_data().
+> #### В данном фрагменте кода создаётся главное окно и основной функционал
+> #### Этот класс наследуется от QMainWindow и отвечает за основное окно программы. При инициализации:
+> #### 1. Устанавливается заголовок и размер окна.
+> #### 2. Создается объект DatabaseManager для работы с базой данных.
+> #### 3. Вызывается метод init_ui() для настройки интерфейса.
+> #### 4. Загружаются данные сотрудников в таблицу через load_data().
 ```python
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -131,14 +131,14 @@ class MainWindow(QMainWindow):
         self.init_ui()
         self.load_data()
 ```
-## Метод init_ui и тул бар 
-> Этот метод создает элементы интерфейса, включая панель инструментов (QToolBar), таблицу (QTableWidget) и кнопки для управления сотрудниками.
+### Метод init_ui и тул бар 
+> #### Этот метод создает элементы интерфейса, включая панель инструментов (QToolBar), таблицу (QTableWidget) и кнопки для управления сотрудниками.
 ```python
 def init_ui(self):
     widget = QWidget()
     layout = QVBoxLayout()
 ```
-### Toolbar:
+#### Toolbar:
 ```python
 toolbar = QToolBar()
 self.addToolBar(toolbar)
@@ -182,6 +182,94 @@ self.table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
 self.table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
 self.table.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
 ```
+### Метод load_data (загрузка данных):
+> #### Загружает данные сотрудников из базы (fetch_employees()) и заполняет таблицу.
+```python
+def load_data(self):
+    employees = self.db.fetch_employees()
+    self.table.setRowCount(0)
+    for row_number, employee in enumerate(employees):
+        self.table.insertRow(row_number)
+        self.table.setItem(row_number, 0, QTableWidgetItem(str(employee["id"])))
+        self.table.setItem(row_number, 1, QTableWidgetItem(employee["first_name"]))
+        self.table.setItem(row_number, 2, QTableWidgetItem(employee["last_name"]))
+        self.table.setItem(row_number, 3, QTableWidgetItem(employee["date_of_birth"]))
+        self.table.setItem(row_number, 4, QTableWidgetItem(employee["position"]))
+        self.table.setItem(row_number, 5, QTableWidgetItem(employee["phone"]))
+        self.table.setItem(row_number, 6, QTableWidgetItem(employee["email"]))
+        self.table.setItem(row_number, 7, QTableWidgetItem(employee["start_date"]))
+
+```
+### Метод add_emploee (добавление сотрудников):
+> #### Открывает диалоговое окно EmployeeDialog, получает введенные данные, добавляет их в базу (add_employee()) и обновляет таблицу.
+```python
+def add_employee(self):
+    dialog = EmployeeDialog(self)
+    if dialog.exec_() == QDialog.Accepted:
+        data = dialog.get_data()
+        self.db.add_employee(data)
+        self.load_data()
+```
+### Метод edit_employee (редактирование сотрудников):
+```python
+def edit_employee(self):
+    selected_items = self.table.selectedItems()
+    if not selected_items:
+        QMessageBox.warning(self, "Выберите сотрудника", "Пожалуйста, выберите сотрудника для редактирования.")
+        return
+```
+> #### Проверяет, выбран ли сотрудник. Если нет, показывает предупреждение.
+```python
+row = selected_items[0].row()
+emp_id = int(self.table.item(row, 0).text())
+employee = {
+    'first_name': self.table.item(row, 1).text(),
+    'last_name': self.table.item(row, 2).text(),
+    'date_of_birth': self.table.item(row, 3).text(),
+    'position': self.table.item(row, 4).text(),
+    'phone': self.table.item(row, 5).text(),
+    'email': self.table.item(row, 6).text(),
+    'start_date': self.table.item(row, 7).text(),
+}
+```
+> #### Получает данные выбранного сотрудника.
+```python
+dialog = EmployeeDialog(self, employee)
+if dialog.exec_() == QDialog.Accepted:
+    new_data = dialog.get_data()
+    self.db.update_employee(emp_id, new_data)
+    self.load_data()
+```
+> #### Открывает EmployeeDialog, получает обновленные данные и обновляет их в базе.
+### Метод delete_emloyee (удаления сотрудников):
+```python
+def delete_employee(self):
+    selected_items = self.table.selectedItems()
+    if not selected_items:
+        QMessageBox.warning(self, "Выберите сотрудника", "Пожалуйста, выберите сотрудника для удаления.")
+        return
+```
+> #### Проверяет, выбран ли сотрудник.
+```python
+row = selected_items[0].row()
+emp_id = int(self.table.item(row, 0).text())
+confirm = QMessageBox.question(
+    self, "Подтверждение",
+    "Вы действительно хотите удалить выбранного сотрудника?",
+    QMessageBox.Yes | QMessageBox.No
+)
+if confirm == QMessageBox.Yes:
+    self.db.delete_employee(emp_id)
+    self.load_data()
+```
+> #### Запрашивает подтверждение удаления, затем удаляет сотрудника из базы.
+
+
+
+
+
+
+
 
 
 
