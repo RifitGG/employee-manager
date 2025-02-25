@@ -263,6 +263,67 @@ if confirm == QMessageBox.Yes:
     self.load_data()
 ```
 > #### Запрашивает подтверждение удаления, затем удаляет сотрудника из базы.
+### generate_report (генерация отчёта):
+```python
+def generate_report(self):
+    filter_dialog = QDialog(self)
+    filter_dialog.setWindowTitle("Генерация отчета")
+    layout = QVBoxLayout()
+```
+> #### Создает диалоговое окно для выбора параметров отчета.
+```python
+filter_layout = QHBoxLayout()
+filter_layout.addWidget(QLabel("Фильтр по должности (оставьте пустым для всех):"))
+position_filter_edit = QLineEdit()
+filter_layout.addWidget(position_filter_edit)
+layout.addLayout(filter_layout)
+```
+> #### Позволяет фильтровать отчет по должности.
+```python
+file_layout = QHBoxLayout()
+file_layout.addWidget(QLabel("Сохранить как:"))
+file_edit = QLineEdit()
+file_layout.addWidget(file_edit)
+browse_button = QPushButton("Обзор")
+file_layout.addWidget(browse_button)
+layout.addLayout(file_layout)
+
+browse_button.clicked.connect(lambda: file_edit.setText(
+    QFileDialog.getSaveFileName(self, "Сохранить отчет", "", "PDF files (*.pdf)")[0]
+))
+```
+> #### Позволяет выбрать имя и место сохранения отчета.
+```python
+if filter_dialog.exec_() == QDialog.Accepted:
+    position_filter = position_filter_edit.text().strip()
+    filename = file_edit.text().strip()
+    if not filename:
+        QMessageBox.warning(self, "Ошибка", "Не указано имя файла для сохранения отчета.")
+        return
+    self.create_pdf_report(filename, position_filter if position_filter != "" else None)
+    QMessageBox.information(self, "Отчет сохранен", f"Отчет успешно сохранен в {filename}")
+```
+### метод create_pdf_report (создание PDF отчёта):
+> #### Генерирует PDF-файл с данными сотрудников.
+```python
+def create_pdf_report(self, filename, position_filter=None):
+    employees = self.db.fetch_employees(position_filter)
+    c = canvas.Canvas(filename, pagesize=letter)
+```
+### Метод show_helo (открытие справки):
+```python
+def show_help(self):
+    help_dialog = HelpDialog(self)
+    help_dialog.exec_()
+```
+
+
+
+
+
+
+
+
 
 
 
