@@ -138,7 +138,7 @@ def init_ui(self):
     widget = QWidget()
     layout = QVBoxLayout()
 ```
-#### Toolbar:
+### Toolbar:
 ```python
 toolbar = QToolBar()
 self.addToolBar(toolbar)
