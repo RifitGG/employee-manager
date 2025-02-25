@@ -13,7 +13,7 @@
 >> - [Toolbar](#Toolbar)
 >> - [Кнопки с действиями для управления сотрудниками](#Кнопки-с-действиями-для-управления-сотрудниками)
 >> - [Таблица сотрудников](#Таблиц-сотрудников)
->> - [Метод load_data (загрузка данных)](#Метод-load-data-(-загрузка-данных))
+>> - [Метод load_data (загрузка данных)](#Метод-load-data-загрузка-данных)
 >> - [Функция изъятия ](#Функция-изъятия)
 >> - [Функция изъятия ](#Функция-изъятия)
 >> - [Функция изъятия ](#Функция-изъятия)
@@ -197,7 +197,7 @@ self.table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
 self.table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
 self.table.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
 ```
-### Метод load_data (загрузка данных):
+### Метод load_data загрузка данных:
 > #### Загружает данные сотрудников из базы (fetch_employees()) и заполняет таблицу.
 ```python
 def load_data(self):
@@ -215,7 +215,7 @@ def load_data(self):
         self.table.setItem(row_number, 7, QTableWidgetItem(employee["start_date"]))
 
 ```
-### Метод add_emploeey (добавление сотрудников):
+### Метод add_emploeey добавление сотрудников:
 > #### Открывает диалоговое окно EmployeeDialog, получает введенные данные, добавляет их в базу (add_employee()) и обновляет таблицу.
 ```python
 def add_employee(self):
@@ -225,7 +225,7 @@ def add_employee(self):
         self.db.add_employee(data)
         self.load_data()
 ```
-### Метод edit_employee (редактирование сотрудников):
+### Метод edit_employee редактирование сотрудников:
 ```python
 def edit_employee(self):
     selected_items = self.table.selectedItems()
@@ -256,7 +256,7 @@ if dialog.exec_() == QDialog.Accepted:
     self.load_data()
 ```
 > #### Открывает EmployeeDialog, получает обновленные данные и обновляет их в базе.
-### Метод delete_emloyee (удаления сотрудников):
+### Метод delete_emloyee удаления сотрудников:
 ```python
 def delete_employee(self):
     selected_items = self.table.selectedItems()
@@ -278,7 +278,7 @@ if confirm == QMessageBox.Yes:
     self.load_data()
 ```
 > #### Запрашивает подтверждение удаления, затем удаляет сотрудника из базы.
-### generate_report (генерация отчёта):
+### generate_report генерация отчёта:
 ```python
 def generate_report(self):
     filter_dialog = QDialog(self)
@@ -318,14 +318,14 @@ if filter_dialog.exec_() == QDialog.Accepted:
     self.create_pdf_report(filename, position_filter if position_filter != "" else None)
     QMessageBox.information(self, "Отчет сохранен", f"Отчет успешно сохранен в {filename}")
 ```
-### Метод create_pdf_report (создание PDF отчёта):
+### Метод create_pdf_report создание PDF отчёта:
 > #### Генерирует PDF-файл с данными сотрудников.
 ```python
 def create_pdf_report(self, filename, position_filter=None):
     employees = self.db.fetch_employees(position_filter)
     c = canvas.Canvas(filename, pagesize=letter)
 ```
-### Метод show_help (открытие справки):
+### Метод show_help открытие справки:
 ```python
 def show_help(self):
     help_dialog = HelpDialog(self)
