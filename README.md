@@ -331,7 +331,10 @@ def show_help(self):
     help_dialog = HelpDialog(self)
     help_dialog.exec_()
 ```
-
+## Синтаксис Dialogs
+> #### Файл dialogs.py содержит два диалоговых окна:
+>> #### - EmployeeDialog – для добавления и редактирования данных сотрудника.
+>> #### - HelpDialog – отображает документацию по использованию приложения.
 
 
 
