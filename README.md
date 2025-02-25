@@ -313,7 +313,7 @@ def create_pdf_report(self, filename, position_filter=None):
     employees = self.db.fetch_employees(position_filter)
     c = canvas.Canvas(filename, pagesize=letter)
 ```
-### Метод show_helo (открытие справки):
+### Метод show_help (открытие справки):
 ```python
 def show_help(self):
     help_dialog = HelpDialog(self)
