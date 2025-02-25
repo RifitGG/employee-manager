@@ -23,7 +23,7 @@
 
 >[Cинтаксис Dialogs](Синтаксис-Dialogs)
 >> - [Метод init_ui](#Метод-init_ui)
->> - [Метод get_data](Метод-get-data)
+>> - [Метод get_data](Метод-get_data)
 >> - [Help Dilogs окно с документацией](Help-Dilogs-окно-с-документацией)
 
  ## ⚠ **ВАЖНО**
