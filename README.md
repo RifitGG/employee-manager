@@ -7,6 +7,8 @@
 >> - [Функция обновления](#Функция-обновления)
 >> - [Функция удаления](#Функция-удаления)
 >> - [Функция изъятия ](#Функция-изъятия)
+>[Синтаксис Main_Window](#Синтаксис-Main_Window)
+>> - 
  ## ⚠ **ВАЖНО**
  ### Для запуска данного приложения требуется установка зависимостей:
 ```console
@@ -303,7 +305,7 @@ if filter_dialog.exec_() == QDialog.Accepted:
     self.create_pdf_report(filename, position_filter if position_filter != "" else None)
     QMessageBox.information(self, "Отчет сохранен", f"Отчет успешно сохранен в {filename}")
 ```
-### метод create_pdf_report (создание PDF отчёта):
+### Метод create_pdf_report (создание PDF отчёта):
 > #### Генерирует PDF-файл с данными сотрудников.
 ```python
 def create_pdf_report(self, filename, position_filter=None):
