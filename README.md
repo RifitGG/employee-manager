@@ -331,10 +331,88 @@ def show_help(self):
     help_dialog = HelpDialog(self)
     help_dialog.exec_()
 ```
-## Синтаксис Dialogs
+### Синтаксис Dialogs
 > #### Файл dialogs.py содержит два диалоговых окна:
 >> - #### EmployeeDialog – для добавления и редактирования данных сотрудника.
 >> - #### HelpDialog – отображает документацию по использованию приложения.
+### EmployeeDialog – Форма добавления/редактирования сотрудника.
+> #### Этот класс представляет собой диалоговое окно для ввода и редактирования информации о сотруднике.
+```python
+class EmployeeDialog(QDialog):
+    def __init__(self, parent=None, employee_data=None):
+        super().__init__(parent)
+        self.setWindowTitle("Добавить сотрудника" if employee_data is None else "Редактировать сотрудника")
+        self.resize(400, 300)
+        self.employee_data = employee_data
+        self.init_ui()
+```
+> #### parent – родительский виджет.
+> #### employee_data – данные сотрудника для редактирования (если None, то создается новый сотрудник).
+> #### Устанавливает заголовок окна в зависимости от переданных данных.
+### Метод init_ui
+> #### Создает поля для ввода данных:
+> #### QLineEdit для имени, фамилии, должности, телефона, email.
+> #### QDateEdit для даты рождения и даты начала работы.
+> #### Устанавливает текущую дату по умолчанию. 
+```python
+def init_ui(self):
+    layout = QVBoxLayout()
+    self.first_name_edit = QLineEdit()
+    self.last_name_edit = QLineEdit()
+    self.dob_edit = QDateEdit(calendarPopup=True)
+    self.dob_edit.setDisplayFormat("yyyy-MM-dd")
+    self.dob_edit.setDate(QDate.currentDate())
+    self.position_edit = QLineEdit()
+    self.phone_edit = QLineEdit()
+    self.email_edit = QLineEdit()
+    self.start_date_edit = QDateEdit(calendarPopup=True)
+    self.start_date_edit.setDisplayFormat("yyyy-MM-dd")
+    self.start_date_edit.setDate(QDate.currentDate())
+```
+#### Добавление кнопок
+> - #### Кнопка "Сохранить" подтверждает ввод данных.
+> - #### Кнопка "Отмена" закрывает окно без сохранения.
+```python
+buttons_layout = QHBoxLayout()
+self.save_button = QPushButton("Сохранить")
+self.cancel_button = QPushButton("Отмена")
+buttons_layout.addWidget(self.save_button)
+buttons_layout.addWidget(self.cancel_button)
+layout.addLayout(buttons_layout)
+```
+#### Заполнение полей при редактировании
+```python
+if self.employee_data:
+    self.first_name_edit.setText(self.employee_data['first_name'])
+    self.last_name_edit.setText(self.employee_data['last_name'])
+    dob = QDate.fromString(self.employee_data['date_of_birth'], "yyyy-MM-dd")
+    if dob.isValid():
+        self.dob_edit.setDate(dob)
+    self.position_edit.setText(self.employee_data['position'])
+    self.phone_edit.setText(self.employee_data['phone'])
+    self.email_edit.setText(self.employee_data['email'])
+    start_date = QDate.fromString(self.employee_data['start_date'], "yyyy-MM-dd")
+    if start_date.isValid():
+        self.start_date_edit.setDate(start_date)
+```
+### Метод get_data
+> #### Возвращает данные в виде словаря
+```python
+def get_data(self):
+    data = {
+        'first_name': self.first_name_edit.text(),
+        'last_name': self.last_name_edit.text(),
+        'date_of_birth': self.dob_edit.date().toString("yyyy-MM-dd"),
+        'position': self.position_edit.text(),
+        'phone': self.phone_edit.text(),
+        'email': self.email_edit.text(),
+        'start_date': self.start_date_edit.date().toString("yyyy-MM-dd")
+    }
+    return data
+```
+
+
+
 
 
 
