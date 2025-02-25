@@ -114,4 +114,74 @@ class DatabaseManager:
             cursor.execute(query)
         return cursor.fetchall()
 ```
+## Синтаксис Main_Window:
+> В данном фрагменте кода создаётся главное окно и основной функционал
+> Этот класс наследуется от QMainWindow и отвечает за основное окно программы. При инициализации:
+> 1. Устанавливается заголовок и размер окна.
+> 2. Создается объект DatabaseManager для работы с базой данных.
+> 3. Вызывается метод init_ui() для настройки интерфейса.
+> 4. Загружаются данные сотрудников в таблицу через load_data().
+```python
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Менеджер по работе с сотрудниками")
+        self.resize(800, 600)
+        self.db = DatabaseManager()
+        self.init_ui()
+        self.load_data()
+```
+## Метод init_ui и тул бар 
+> Этот метод создает элементы интерфейса, включая панель инструментов (QToolBar), таблицу (QTableWidget) и кнопки для управления сотрудниками.
+```python
+def init_ui(self):
+    widget = QWidget()
+    layout = QVBoxLayout()
+```
+### Toolbar:
+```python
+toolbar = QToolBar()
+self.addToolBar(toolbar)
+```
+### Кнопки с действиями для управления сотрудниками: 
+> #### Каждое действие связано с соответствующей функцией.
+```python
+add_action = QAction("Добавить", self)
+add_action.triggered.connect(self.add_employee)
+toolbar.addAction(add_action)
+
+edit_action = QAction("Редактировать", self)
+edit_action.triggered.connect(self.edit_employee)
+toolbar.addAction(edit_action)
+
+delete_action = QAction("Удалить", self)
+delete_action.triggered.connect(self.delete_employee)
+toolbar.addAction(delete_action)
+
+report_action = QAction("Сгенерировать отчет", self)
+report_action.triggered.connect(self.generate_report)
+toolbar.addAction(report_action)
+
+help_action = QAction("Документация", self)
+help_action.triggered.connect(self.show_help)
+toolbar.addAction(help_action)
+```
+### Таблица сотрудников:
+> Таблица:
+> 1. Содержит 8 столбцов с заголовками.
+> 2. Запрещает редактирование (NoEditTriggers).
+> 3. Позволяет выбирать только строки (SelectRows).
+```python
+self.table = QTableWidget()
+self.table.setColumnCount(8)
+self.table.setHorizontalHeaderLabels([
+    "ID", "Имя", "Фамилия", "Дата рождения",
+    "Должность", "Телефон", "Email", "Дата начала"
+])
+self.table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+self.table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+self.table.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+```
+
+
 
