@@ -135,7 +135,7 @@ class MainWindow(QMainWindow):
         self.init_ui()
         self.load_data()
 ```
-### Метод init_ui и тул бар 
+### Метод init_ui и Toolbar
 > #### Этот метод создает элементы интерфейса, включая панель инструментов (QToolBar), таблицу (QTableWidget) и кнопки для управления сотрудниками.
 ```python
 def init_ui(self):
@@ -204,7 +204,7 @@ def load_data(self):
         self.table.setItem(row_number, 7, QTableWidgetItem(employee["start_date"]))
 
 ```
-### Метод add_emploee (добавление сотрудников):
+### Метод add_emploeey (добавление сотрудников):
 > #### Открывает диалоговое окно EmployeeDialog, получает введенные данные, добавляет их в базу (add_employee()) и обновляет таблицу.
 ```python
 def add_employee(self):
