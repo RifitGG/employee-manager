@@ -1,4 +1,3 @@
-# main_window.py
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem,
@@ -7,9 +6,18 @@ from PyQt5.QtWidgets import (
 )
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 
 from db_manager import DatabaseManager
 from dialogs import EmployeeDialog, HelpDialog
+
+# Регистрация шрифта с поддержкой кириллицы
+try:
+    pdfmetrics.registerFont(TTFont('Arial', 'arial.ttf'))
+except:
+    print("Шрифт Arial не найден, попытка использовать стандартный шрифт")
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -27,25 +35,18 @@ class MainWindow(QMainWindow):
         toolbar = QToolBar()
         self.addToolBar(toolbar)
 
-        add_action = QAction("Добавить", self)
-        add_action.triggered.connect(self.add_employee)
-        toolbar.addAction(add_action)
+        actions = [
+            ("Добавить", self.add_employee),
+            ("Редактировать", self.edit_employee),
+            ("Удалить", self.delete_employee),
+            ("Сгенерировать отчет", self.generate_report),
+            ("Документация", self.show_help)
+        ]
 
-        edit_action = QAction("Редактировать", self)
-        edit_action.triggered.connect(self.edit_employee)
-        toolbar.addAction(edit_action)
-
-        delete_action = QAction("Удалить", self)
-        delete_action.triggered.connect(self.delete_employee)
-        toolbar.addAction(delete_action)
-
-        report_action = QAction("Сгенерировать отчет", self)
-        report_action.triggered.connect(self.generate_report)
-        toolbar.addAction(report_action)
-
-        help_action = QAction("Документация", self)
-        help_action.triggered.connect(self.show_help)
-        toolbar.addAction(help_action)
+        for text, handler in actions:
+            action = QAction(text, self)
+            action.triggered.connect(handler)
+            toolbar.addAction(action)
 
         self.table = QTableWidget()
         self.table.setColumnCount(8)
@@ -66,127 +67,134 @@ class MainWindow(QMainWindow):
         self.table.setRowCount(0)
         for row_number, employee in enumerate(employees):
             self.table.insertRow(row_number)
-            self.table.setItem(row_number, 0, QTableWidgetItem(str(employee["id"])))
-            self.table.setItem(row_number, 1, QTableWidgetItem(employee["first_name"]))
-            self.table.setItem(row_number, 2, QTableWidgetItem(employee["last_name"]))
-            self.table.setItem(row_number, 3, QTableWidgetItem(employee["date_of_birth"]))
-            self.table.setItem(row_number, 4, QTableWidgetItem(employee["position"]))
-            self.table.setItem(row_number, 5, QTableWidgetItem(employee["phone"]))
-            self.table.setItem(row_number, 6, QTableWidgetItem(employee["email"]))
-            self.table.setItem(row_number, 7, QTableWidgetItem(employee["start_date"]))
+            for col, key in enumerate(["id", "first_name", "last_name",
+                                       "date_of_birth", "position",
+                                       "phone", "email", "start_date"]):
+                self.table.setItem(row_number, col, QTableWidgetItem(str(employee[key])))
 
     def add_employee(self):
         dialog = EmployeeDialog(self)
         if dialog.exec_() == QDialog.Accepted:
-            data = dialog.get_data()
-            self.db.add_employee(data)
+            self.db.add_employee(dialog.get_data())
             self.load_data()
 
     def edit_employee(self):
-        selected_items = self.table.selectedItems()
-        if not selected_items:
-            QMessageBox.warning(self, "Выберите сотрудника", "Пожалуйста, выберите сотрудника для редактирования.")
+        if not (row := self._get_selected_row()):
             return
-        row = selected_items[0].row()
         emp_id = int(self.table.item(row, 0).text())
-        employee = {
-            'first_name': self.table.item(row, 1).text(),
-            'last_name': self.table.item(row, 2).text(),
-            'date_of_birth': self.table.item(row, 3).text(),
-            'position': self.table.item(row, 4).text(),
-            'phone': self.table.item(row, 5).text(),
-            'email': self.table.item(row, 6).text(),
-            'start_date': self.table.item(row, 7).text(),
-        }
+        employee = {key: self.table.item(row, col).text()
+                    for col, key in enumerate(["id", "first_name", "last_name",
+                                               "date_of_birth", "position",
+                                               "phone", "email", "start_date"])}
         dialog = EmployeeDialog(self, employee)
         if dialog.exec_() == QDialog.Accepted:
-            new_data = dialog.get_data()
-            self.db.update_employee(emp_id, new_data)
+            self.db.update_employee(emp_id, dialog.get_data())
             self.load_data()
 
     def delete_employee(self):
-        selected_items = self.table.selectedItems()
-        if not selected_items:
-            QMessageBox.warning(self, "Выберите сотрудника", "Пожалуйста, выберите сотрудника для удаления.")
+        if not (row := self._get_selected_row()):
             return
-        row = selected_items[0].row()
         emp_id = int(self.table.item(row, 0).text())
-        confirm = QMessageBox.question(
-            self, "Подтверждение",
-            "Вы действительно хотите удалить выбранного сотрудника?",
-            QMessageBox.Yes | QMessageBox.No
-        )
-        if confirm == QMessageBox.Yes:
+        if QMessageBox.Yes == QMessageBox.question(
+                self, "Подтверждение",
+                "Удалить выбранного сотрудника?",
+                QMessageBox.Yes | QMessageBox.No
+        ):
             self.db.delete_employee(emp_id)
             self.load_data()
 
     def generate_report(self):
-        filter_dialog = QDialog(self)
-        filter_dialog.setWindowTitle("Генерация отчета")
-        layout = QVBoxLayout()
-
-        filter_layout = QHBoxLayout()
-        filter_layout.addWidget(QLabel("Фильтр по должности (оставьте пустым для всех):"))
-        position_filter_edit = QLineEdit()
-        filter_layout.addWidget(position_filter_edit)
-        layout.addLayout(filter_layout)
-
-        file_layout = QHBoxLayout()
-        file_layout.addWidget(QLabel("Сохранить как:"))
-        file_edit = QLineEdit()
-        file_layout.addWidget(file_edit)
-        browse_button = QPushButton("Обзор")
-        file_layout.addWidget(browse_button)
-        layout.addLayout(file_layout)
-
-        browse_button.clicked.connect(lambda: file_edit.setText(
-            QFileDialog.getSaveFileName(self, "Сохранить отчет", "", "PDF files (*.pdf)")[0]
-        ))
-
-        buttons_layout = QHBoxLayout()
-        ok_button = QPushButton("Сгенерировать")
-        cancel_button = QPushButton("Отмена")
-        buttons_layout.addWidget(ok_button)
-        buttons_layout.addWidget(cancel_button)
-        layout.addLayout(buttons_layout)
-
-        filter_dialog.setLayout(layout)
-        ok_button.clicked.connect(filter_dialog.accept)
-        cancel_button.clicked.connect(filter_dialog.reject)
-
-        if filter_dialog.exec_() == QDialog.Accepted:
-            position_filter = position_filter_edit.text().strip()
-            filename = file_edit.text().strip()
-            if not filename:
-                QMessageBox.warning(self, "Ошибка", "Не указано имя файла для сохранения отчета.")
-                return
-            self.create_pdf_report(filename, position_filter if position_filter != "" else None)
-            QMessageBox.information(self, "Отчет сохранен", f"Отчет успешно сохранен в {filename}")
+        dialog = ReportDialog(self)
+        if dialog.exec_() == QDialog.Accepted:
+            filename, position_filter = dialog.get_data()
+            self.create_pdf_report(filename, position_filter)
+            QMessageBox.information(self, "Успех", f"Отчет сохранен в:\n{filename}")
 
     def create_pdf_report(self, filename, position_filter=None):
         employees = self.db.fetch_employees(position_filter)
         c = canvas.Canvas(filename, pagesize=letter)
         width, height = letter
-        c.setFont("Helvetica-Bold", 16)
-        c.drawString(200, height - 50, "Отчет по сотрудникам")
-        c.setFont("Helvetica", 12)
+
+        # Настройка шрифтов
+        font_name = 'Arial' if 'Arial' in pdfmetrics.getRegisteredFontNames() else 'Helvetica'
+        c.setFont(font_name, 16)
+        c.drawCentredString(width / 2, height - 50, "Отчет по сотрудникам")
+
+        c.setFont(font_name, 12)
         y = height - 80
-        headers = ["Имя", "Фамилия", "Должность", "Дата начала работы"]
+        headers = ["Имя", "Фамилия", "Должность", "Дата начала"]
         x_positions = [50, 150, 300, 450]
+
+        # Заголовки
         for i, header in enumerate(headers):
             c.drawString(x_positions[i], y, header)
-        y -= 20
+
+        # Данные
         for emp in employees:
-            c.drawString(x_positions[0], y, emp["first_name"])
-            c.drawString(x_positions[1], y, emp["last_name"])
-            c.drawString(x_positions[2], y, emp["position"])
-            c.drawString(x_positions[3], y, emp["start_date"])
             y -= 20
             if y < 50:
                 c.showPage()
                 y = height - 50
+                c.setFont(font_name, 12)
+
+            c.drawString(x_positions[0], y, emp["first_name"])
+            c.drawString(x_positions[1], y, emp["last_name"])
+            c.drawString(x_positions[2], y, emp["position"])
+            c.drawString(x_positions[3], y, emp["start_date"])
+
         c.save()
 
     def show_help(self):
-        help_dialog = HelpDialog(self)
-        help_dialog.exec_()
+        HelpDialog(self).exec_()
+
+    def _get_selected_row(self):
+        if not (selected := self.table.selectedItems()):
+            QMessageBox.warning(self, "Ошибка", "Выберите сотрудника")
+            return None
+        return selected[0].row()
+
+
+class ReportDialog(QDialog):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.setWindowTitle("Генерация отчета")
+        layout = QVBoxLayout()
+
+        # Фильтр по должности
+        filter_layout = QHBoxLayout()
+        filter_layout.addWidget(QLabel("Фильтр по должности:"))
+        self.position_filter = QLineEdit()
+        filter_layout.addWidget(self.position_filter)
+        layout.addLayout(filter_layout)
+
+        # Выбор файла
+        file_layout = QHBoxLayout()
+        file_layout.addWidget(QLabel("Файл для сохранения:"))
+        self.file_edit = QLineEdit()
+        file_layout.addWidget(self.file_edit)
+        browse_btn = QPushButton("Обзор")
+        browse_btn.clicked.connect(self._browse_file)
+        file_layout.addWidget(browse_btn)
+        layout.addLayout(file_layout)
+
+        # Кнопки
+        btn_box = QHBoxLayout()
+        ok_btn = QPushButton("Создать")
+        ok_btn.clicked.connect(self.accept)
+        btn_box.addWidget(ok_btn)
+        btn_box.addWidget(QPushButton("Отмена", clicked=self.reject))
+        layout.addLayout(btn_box)
+
+        self.setLayout(layout)
+
+    def _browse_file(self):
+        filename, _ = QFileDialog.getSaveFileName(
+            self, "Сохранить отчет", "", "PDF Files (*.pdf)")
+        if filename:
+            self.file_edit.setText(filename)
+
+    def get_data(self):
+        return (
+            self.file_edit.text(),
+            self.position_filter.text().strip() or None
+        )
